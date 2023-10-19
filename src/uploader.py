@@ -10,11 +10,13 @@ class Uploader:
     def __init__(self, video_entry):
         self.video_entry = video_entry
         self.config = Config()
-        self.file_path = os.path.join(self.config.video_dir, self.video_entry.filename + ".mp4")
+        self.file_path = os.path.join(
+            self.config.video_dir, f"{self.video_entry.filename}.mp4"
+        )
 
     def upload_to_youtube(self, schedule=False, schedule_day="2023-09-14", schedule_time="01:30"):
         # File path
-        file_path = self.config.config_dir + "client_secrets.json"
+        file_path = f"{self.config.config_dir}client_secrets.json"
 
         # Check if the file exists
         if not os.path.exists(file_path):

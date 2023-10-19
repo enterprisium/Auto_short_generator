@@ -107,9 +107,12 @@ def upload_youtube_video(file_path, client_secret_path, title=" ", description="
         # Find the first selectable calendar day that contains the text "14"
 
         selectable_day = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH,
-                                            "//span[contains(@class, 'calendar-day') and not(contains(@class, 'disabled')) and not(contains(@class, 'invisible')) and contains(., '{}')]".format(
-                                                schedule_day)))
+            EC.presence_of_element_located(
+                (
+                    By.XPATH,
+                    f"//span[contains(@class, 'calendar-day') and not(contains(@class, 'disabled')) and not(contains(@class, 'invisible')) and contains(., '{schedule_day}')]",
+                )
+            )
         )
 
         # Scroll the day into view
@@ -151,8 +154,6 @@ def upload_youtube_video(file_path, client_secret_path, title=" ", description="
             EC.presence_of_element_located((By.XPATH, "//ytcp-button[@id='save-button']/div[text()='Programmer' or "
                                                       "text()='Schedule']"))
         )
-        time.sleep(1)  # Sleep to mimic human interaction
-        button.click()
     else:
         # Locate the 'first-container'
         first_container = WebDriverWait(driver, 10).until(
@@ -170,8 +171,8 @@ def upload_youtube_video(file_path, client_secret_path, title=" ", description="
             EC.presence_of_element_located((By.XPATH, "//ytcp-button[@id='save-button']/div[text()='Enregistrer' or "
                                                       "text()='Save']"))
         )
-        time.sleep(1)  # Sleep to mimic human interaction
-        button.click()
+    time.sleep(1)  # Sleep to mimic human interaction
+    button.click()
     time.sleep(4)
     driver.quit()
 

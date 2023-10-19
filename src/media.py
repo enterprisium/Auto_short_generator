@@ -39,12 +39,16 @@ class Media:
         else:
             self.pad_to_aspect_ratio()
 
-        zoom = True
-        shift = True
-        if "zoom" in info and info["zoom"].isdigit() and int(info["zoom"]) == 0:
-            zoom = False
-        if "shift" in info and info["shift"].isdigit() and int(info["shift"]) == 0:
-            shift = False
+        zoom = (
+            "zoom" not in info
+            or not info["zoom"].isdigit()
+            or int(info["zoom"]) != 0
+        )
+        shift = (
+            "shift" not in info
+            or not info["shift"].isdigit()
+            or int(info["shift"]) != 0
+        )
         if zoom or shift:
             self.shift_and_zoom(zoom, shift)
 
@@ -181,10 +185,7 @@ def shift_and_zoom(get_frame, t, max_shift_factor=0.18, max_zoom_factor=5, durat
     top = int((new_height - height) / 2)
     left = int((new_width - width) / 2)
 
-    # Crop to original frame size
-    zoomed_frame = zoomed_frame_umat.get()[top:top + height, left:left + width]
-
-    return zoomed_frame
+    return zoomed_frame_umat.get()[top:top + height, left:left + width]
 
 
 def pad_video_to_aspect_ratio(video_clip, width, height):

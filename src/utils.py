@@ -77,7 +77,7 @@ class Config:
             self.dict_model_path = settings["alignment_model"]["dict_model_path"]
 
         except FileNotFoundError:
-            print(f"Configuration file not found.")
+            print("Configuration file not found.")
         except KeyError as e:
             print(f"Missing key in configuration file: {e}")
         except Exception as e:
@@ -103,9 +103,7 @@ def generate_save_path(audio1, audio2, extension="mp3"):
 
     # Generate the new filename and save path
     new_filename = f"{filename1}_{filename2}.{extension}"
-    new_save_path = os.path.join(dir1, new_filename)
-
-    return new_save_path
+    return os.path.join(dir1, new_filename)
 
 
 class Audio:
@@ -118,7 +116,7 @@ class Audio:
         if file_path is None:
             # Save the audio segment to the temporary file
             audio_folder = Config().audio_dir
-            file_path = audio_folder + "temp.wav"
+            file_path = f"{audio_folder}temp.wav"
 
             audio_segment.export(file_path, format="wav")
         self.audio_segment = audio_segment
@@ -167,10 +165,7 @@ class Audio:
 
         if save_audio:
             overlaid_audio_segment.export(new_audio_path, format="wav")
-        # Create a new Audio object for the overlaid audio
-        overlaid_audio = Audio(new_audio_path, audio_segment=overlaid_audio_segment)
-
-        return overlaid_audio
+        return Audio(new_audio_path, audio_segment=overlaid_audio_segment)
 
 
 def save_wav(audio_bytes, filename, n_channels=1, sampwidth=2, framerate=44100):

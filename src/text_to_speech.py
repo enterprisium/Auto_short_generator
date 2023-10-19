@@ -12,12 +12,11 @@ class ElevenLabsAPI:
 
     def text_to_speech(self, script):
         try:
-            audio = generate(
+            return generate(
                 text=script,
                 voice=self.config.elevenlabs_voice,
-                model=self.config.elevenlabs_model
+                model=self.config.elevenlabs_model,
             )
-            return audio
         except Exception as e:
             print(f"An error occurred while calling the ElevenLabs API: {e}")
             return None

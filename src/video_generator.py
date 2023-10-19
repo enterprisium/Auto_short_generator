@@ -33,10 +33,7 @@ def create_emoji_image_clip(emoji, font_size):
     # Draw the emoji
     draw.text((0, 0), emoji, font=font, fill=(255, 255, 255, 255), embedded_color=True)
 
-    # Create an ImageClip
-    emoji_clip = ImageClip(np.array(image))  # 5 seconds duration, adjust as needed
-
-    return emoji_clip
+    return ImageClip(np.array(image))
 
 
 def extract_and_remove_emojis(text):
@@ -89,10 +86,13 @@ def match_aligned_words_to_text(filtered_aligned_words, original_text, extracted
     missing_words = []
     for i in range(len(filtered_aligned_words) - 1):
         next_word = filtered_aligned_words[i + 1]['alignedWord'].lower()
-        pattern = re.compile(r'{}(.*?)(?={})'.format(re.escape(current_word), re.escape(next_word)), re.DOTALL)
-        match = pattern.search(cleaned_text.lower()[start_pos:start_pos+50])
-
-        if match:
+        pattern = re.compile(
+            f'{re.escape(current_word)}(.*?)(?={re.escape(next_word)})',
+            re.DOTALL,
+        )
+        if match := pattern.search(
+            cleaned_text.lower()[start_pos : start_pos + 50]
+        ):
             start, end = match.span()
             end += start_pos
             mapped_start, mapped_end = mapping[start + start_pos], mapping[end - 1]
@@ -105,13 +105,16 @@ def match_aligned_words_to_text(filtered_aligned_words, original_text, extracted
                 # Handle emojis for missing words
                 while emoji_index < len(extracted_emojis):
                     pos, emoji = extracted_emojis[emoji_index]
-                    if mapping[start_pos] <= pos - offset_emojis <= mapped_start:
-                        missing_text = missing_text[:pos - offset_emojis - mapping[start_pos]] + emoji + missing_text[pos - offset_emojis - mapping[start_pos]:]
-                        offset_emojis += len(emoji)
-                        emoji_index += 1
-                    else:
+                    if (
+                        not mapping[start_pos]
+                        <= pos - offset_emojis
+                        <= mapped_start
+                    ):
                         break
 
+                    missing_text = missing_text[:pos - offset_emojis - mapping[start_pos]] + emoji + missing_text[pos - offset_emojis - mapping[start_pos]:]
+                    offset_emojis += len(emoji)
+                    emoji_index += 1
                 for missing_word in missing_words:
                     if missing_words_text:
                         word_aligned2text[missing_word].put(missing_words_text.pop(0))
@@ -125,14 +128,13 @@ def match_aligned_words_to_text(filtered_aligned_words, original_text, extracted
 
             while emoji_index < len(extracted_emojis):
                 pos, emoji = extracted_emojis[emoji_index]
-                if mapped_start <= pos - offset_emojis <= mapped_end:
-                    matched_text = matched_text[:pos - offset_emojis - mapped_start] + emoji + matched_text[
-                                                                                               pos - offset_emojis - mapped_start:]
-                    offset_emojis += len(emoji)
-                    emoji_index += 1
-                else:
+                if not mapped_start <= pos - offset_emojis <= mapped_end:
                     break
 
+                matched_text = matched_text[:pos - offset_emojis - mapped_start] + emoji + matched_text[
+                                                                                           pos - offset_emojis - mapped_start:]
+                offset_emojis += len(emoji)
+                emoji_index += 1
             word_aligned2text[current_word].put(matched_text)
             start_pos = end
         else:
@@ -144,14 +146,17 @@ def match_aligned_words_to_text(filtered_aligned_words, original_text, extracted
     matched_text = original_text[start_pos:]
     while emoji_index < len(extracted_emojis):
         pos, emoji = extracted_emojis[emoji_index]
-        if start_pos <= pos - offset_emojis <= len(matched_text) + start_pos:
-            matched_text = matched_text[:pos - offset_emojis - start_pos] + emoji + matched_text[
-                                                                                       pos - offset_emojis - start_pos:]
-            offset_emojis += len(emoji)
-            emoji_index += 1
-        else:
+        if (
+            not start_pos
+            <= pos - offset_emojis
+            <= len(matched_text) + start_pos
+        ):
             break
 
+        matched_text = matched_text[:pos - offset_emojis - start_pos] + emoji + matched_text[
+                                                                                   pos - offset_emojis - start_pos:]
+        offset_emojis += len(emoji)
+        emoji_index += 1
     word_aligned2text[last_word].put(matched_text.strip())
 
     return word_aligned2text

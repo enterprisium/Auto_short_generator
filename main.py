@@ -19,15 +19,12 @@ def main():
 
     for video in videos:
         media_folder = config.image_dir
-        if video.filename is None:
-            media_folder += f"{csv_name}/"
-        else:
-            media_folder += video.filename
+        media_folder += f"{csv_name}/" if video.filename is None else video.filename
         video_generator = VideoGeneration(media_folder)
 
         # Generate audio from script
         audio_object = tts.get_audio(video.script) if not video.script.isspace() and video.script else Audio(audio_segment=AudioSegment.silent(duration=40000))
-        music_file_path = os.path.join(config.music_dir, f"1.mp3")
+        music_file_path = os.path.join(config.music_dir, "1.mp3")
         music_object = Audio(music_file_path)
         video_file_path = video_generator.generate_video(audio_object, video.script, video.title,
                                                          video.filename or csv_name, music_object)
